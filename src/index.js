@@ -5,32 +5,18 @@ import './index.css';
 class Game extends React.Component {
 	constructor(props) {
 		super(props);
-		let squares = Array(64).fill(null);
-		squares[1] = "r";
-		squares[3] = "r";
-		squares[5] = "r";
-		squares[7] = "r";
-		squares[8] = "r";
-		squares[10] = "r";
-		squares[12] = "r";
-		squares[14] = "r";
-		squares[17] = "r";
-		squares[19] = "r";
-		squares[21] = "r";
-		squares[23] = "r";
+		let squares = [];
+		squares.push(["b",null,"b",null,"b",null,"b",null]);
+		squares.push([null,"b",null,"b",null,"b",null,"b"]);
+		squares.push(["b",null,"b",null,"b",null,"b",null]);
 
-		squares[62] = "b";
-		squares[60] = "b";
-		squares[58] = "b";
-		squares[56] = "b";
-		squares[55] = "b";
-		squares[53] = "b";
-		squares[51] = "b";
-		squares[49] = "b";
-		squares[46] = "b";
-		squares[44] = "b";
-		squares[42] = "b";
-		squares[40] = "b";
+		squares.push([null, null, null, null, null, null, null, null]);
+		squares.push([null, null, null, null, null, null, null, null]);
+		
+		squares.push([null,"r",null,"r",null,"r",null,"r"]);
+		squares.push(["r",null,"r",null,"r",null,"r",null]);
+		squares.push([null,"r",null,"r",null,"r",null,"r"]);
+
 		console.log("Game");
 		console.log(squares);
 		this.state= {
@@ -94,28 +80,28 @@ class Board extends React.Component {
 		return (
 			<div className="board">
 				<Row 
-					squares={this.state.squares.squares.slice(0,8)}
+					squares={this.state.squares.squares[0]}
 				/>
 				<Row
-					squares={this.state.squares.squares.slice(8,16)}
+					squares={this.state.squares.squares[1]}
 				/>
 				<Row 
-					squares={this.state.squares.squares.slice(16,24)}
+					squares={this.state.squares.squares[2]}
 				/>
 				<Row 
-					squares={this.state.squares.squares.slice(24,32)}
+					squares={this.state.squares.squares[3]}
 				/>
 				<Row 
-					squares={this.state.squares.squares.slice(32,40)}
+					squares={this.state.squares.squares[4]}
 				/>
 				<Row 
-					squares={this.state.squares.squares.slice(40,48)}
+					squares={this.state.squares.squares[5]}
 				/>
 				<Row 
-					squares={this.state.squares.squares.slice(48,56)}
+					squares={this.state.squares.squares[6]}
 				/>
 				<Row 
-					squares={this.state.squares.squares.slice(56,64)}
+					squares={this.state.squares.squares[7]}
 				/>
 			</div>
 		);
