@@ -20,22 +20,21 @@ class Game extends React.Component {
 		console.log("Game");
 		console.log(squares);
 		this.state= {
-			history: [{
-				squares: {squares},
-			}],
+			squares: squares,
 			stepNumber: 0,
 			player: 'Rr',
-			moveFrom: -1
+			moveFrom: [-1,-1]
 		};
 	}
 
 	handleClick(src) {
 		console.log(src);
-		const history = this.state.history.slice(0, this.state.stepNumber + 1);
-		const current = history[history.length -1];
-		const squares = current.squares.squares.slice();
-		console.log(squares);
-		if(this.state.moveFrom === -1) {
+		console.log(this.state.moveFrom);
+		console.log("State");
+		console.log(this.state);
+		const moveFrom = this.state.moveFrom.slice();
+		const squares = this.state.squares.slice();
+		if(JSON.stringify(moveFrom) === JSON.stringify([-1,-1])) {
 			console.log("move from = -1");
 			console.log(this.state.player);
 			console.log(squares[src[0]][src[1]]);
@@ -43,21 +42,53 @@ class Game extends React.Component {
 				return; //todo: add error message
 			console.log("selected correct player");
 			this.setState((state) => {
-				return {moveFrom: src}
+				return {moveFrom: src.slice()}
 			});
-			console.log("changed moveFrom state, about to call showValidMoves");
+			console.log("State after changing move from, about to call showValidMoves");
+			console.log(this.state);
 			this.showValidMoves(src);
 		}
 		else {
+			console.log("State before changing moveFrom back");
+			console.log(this.state);
+			console.log("About to compare moveFrom and src");
+			console.log(this.state.moveFrom);
+			console.log(src);
+			if(JSON.stringify(moveFrom) === JSON.stringify(src)) {
+				this.setState((state) => {
+					return {moveFrom: [-1,-1]}
+				});
+				this.clearHighlights();
+				return;
+			}
 			//todo:do second half of move
 		}
 		return;
 	}
+	clearHighlights() {
+		let squares = [];
+		for(let index = 0; index < 8; index++) {
+			squares.push(this.state.squares[index].slice());
+		}
+		for(var row of squares) {
+			for(var index = 0; index < 8; index++) {
+				if(row[index] === 'h') {
+					row[index] = null;
+				}
+			}
+		}
+		console.log("cleared squares");
+		console.log(squares);
+		this.setState((state) => {
+			return {squares: squares}
+		});
+	}
 	showValidMoves(src) {
 		let validMoves = [];
-		const history = this.state.history.slice(0, this.state.stepNumber + 1);
-		const current = history[history.length -1];
-		const squares = current.squares.squares.slice();
+		let squares = [];
+		for(let index = 0; index < 8; index++) {
+			squares.push(this.state.squares[index].slice());
+		}
 		const dir = this.state.player === 'Rr' ? -1:1;
 		console.log("dir: " + dir);
 		if(src[0] + dir >= 0 && src[0] + dir < 8 && src[1] + 1 >= 0 && src[1] + 1 < 8) 
@@ -69,7 +100,13 @@ class Game extends React.Component {
 				validMoves.push([src[0] + dir, src[1] - 1]);
 			}
 		validMoves.push(...this.showValidJumps(src, squares));
-		console.log(validMoves);
+		for(var move of validMoves) {
+			squares[move[0]][move[1]] = 'h';
+		}
+		this.setState((state) => {
+			return {squares: squares}
+		});
+		console.log(squares);
 	}
 	showValidJumps(src, squares) {
 		let validJumps = [];
@@ -92,13 +129,12 @@ class Game extends React.Component {
 		return validJumps;		
 	}
 	render() {
-    	const history = this.state.history;
-    	const current = history[this.state.stepNumber];
+	const squares = this.state.squares.slice();
 		return (
 			<div className="game">
 				<h2>Checkers</h2>
 				<Board 
-					squares={current.squares}
+					squares={squares}
 					onClick={(src) => this.handleClick(src)}
 				/>
 			</div>
@@ -117,35 +153,35 @@ class Board extends React.Component {
 		return (
 			<div className="row"> 
 				<Square
-					value={this.props.squares.squares[i][0]}
+					value={this.props.squares[i][0]}
 					onClick={() => this.props.onClick([i,0])}
 				/>
 				<Square
-					value={this.props.squares.squares[i][1]}
+					value={this.props.squares[i][1]}
 					onClick={() => this.props.onClick([i,1])}
 				/>
 				<Square
-					value={this.props.squares.squares[i][2]}
+					value={this.props.squares[i][2]}
 					onClick={() => this.props.onClick([i,2])}
 				/>
 				<Square
-					value={this.props.squares.squares[i][3]}
+					value={this.props.squares[i][3]}
 					onClick={() => this.props.onClick([i,3])}
 				/>
 				<Square
-					value={this.props.squares.squares[i][4]}
+					value={this.props.squares[i][4]}
 					onClick={() => this.props.onClick([i,4])}
 				/>
 				<Square
-					value={this.props.squares.squares[i][5]}
+					value={this.props.squares[i][5]}
 					onClick={() => this.props.onClick([i,5])}
 				/>
 				<Square
-					value={this.props.squares.squares[i][6]}
+					value={this.props.squares[i][6]}
 					onClick={() => this.props.onClick([i,6])}
 				/>
 				<Square
-					value={this.props.squares.squares[i][7]}
+					value={this.props.squares[i][7]}
 					onClick={() => this.props.onClick([i,7])}
 				/>
 			</div>
@@ -173,11 +209,18 @@ class Board extends React.Component {
 }
 
 function Square(props) {
+	if(props.value === 'h') {
+		return (
+			<div className="selectedSquare" onClick={props.onClick}>
+				<p></p>
+			</div>
+		);
+	}
 	return (
 		<div className="square" onClick={props.onClick}>
 			<p>{props.value}</p>
 		</div>
-	)
+	);
 }
 
 
