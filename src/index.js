@@ -7,11 +7,11 @@ class Game extends React.Component {
 		super(props);
 		let squares = [];
 		squares.push(["b",null,"b",null,"b",null,"b",null]);
-		squares.push([null,"b",null,"b",null,"b",null,"b"]);
+		squares.push([null,"b",null,"b",null,null,null,"b"]);
 		squares.push(["b",null,"b",null,"b",null,"b",null]);
 
 		squares.push([null, null, null, null, null, null, null, null]);
-		squares.push([null, null, null, null, null, null, null, null]);
+		squares.push([null, null, "b", null, null, null, null, null]);
 		
 		squares.push([null,"r",null,"r",null,"r",null,"r"]);
 		squares.push(["r",null,"r",null,"r",null,"r",null]);
@@ -108,22 +108,37 @@ class Game extends React.Component {
 		});
 		console.log(squares);
 	}
-	showValidJumps(src, squares) {
+	showValidJumps(src, squaresRef) {
+		let squares = [];
+		for(let index = 0; index < 8; index++) {
+			squares.push(squaresRef[index].slice());
+		}
 		let validJumps = [];
+		console.log("Starting looking for jumps");
 		const dir = this.state.player === 'Rr' ? -1:1;
-		const enemy = this.state.player === 'Rr' ? 'Br':'Rr';
-		if(src[0] + (2*dir) >= 0 && src[0] + (2*dir) < 8 && src[1] + 2 >= 0 && src[1] + 2 < 8) {
-			if(squares[src[0] + dir][src[1] + 1] === enemy && !squares[src[0] + (2*dir)][src[1] + 2]) {
+		const enemy = this.state.player === 'Rr' ? 'Bb':'Rr';
+		console.log("dir: " + dir);
+		console.log("enemy: " + enemy);
+		if(src[0] + (2*dir) >= 0 && src[0] + (2*dir) < 8 && src[1] + 2 >= 0 && src[1] + 2 < 8) {	//check that the right jump is within the board
+			console.log("right jump is on board");
+			if(enemy.includes(squares[src[0] + dir][src[1] + 1])  && squares[src[0] + (2*dir)][src[1] + 2] === null) {	//check that square between the jump is an enemy piece, and dst in null
+				console.log("right jump is valid");
 				validJumps.push([src[0] + (2*dir), src[1] + 2]);
 				squares[src[0] + dir][src[1] + 1] = null;
-				validJumps.push(...this.validJumps([src[0] + (2*dir), src[1] + 2], squares));
+				validJumps.push(...this.showValidJumps([src[0] + (2*dir), src[1] + 2], squares));
 				}
 		}
-		if(src[0] + (2*dir) >= 0 && src[0] + (2*dir) < 8 && src[1] - 2 >= 0 && src[1] - 2 < 8) {
-			if(squares[src[0] + dir][src[1] - 1] === enemy && !squares[src[0] + (2*dir)][src[1] - 2]) {
+		if(src[0] + (2*dir) >= 0 && src[0] + (2*dir) < 8 && src[1] - 2 >= 0 && src[1] - 2 < 8) {	//check that left jump is within the board
+			console.log("left jump is on board, valid enemy: ");
+			console.log("enemy: " + enemy);
+			console.log("square to jump: " + squares[src[0] + dir][src[1] - 1]);
+			console.log(enemy.includes(squares[src[0] + dir][src[1] - 1]));
+			console.log("destination: " + squares[src[0] + (2*dir)][src[1] - 2]);
+			if(enemy.includes(squares[src[0] + dir][src[1] - 1]) && squares[src[0] + (2*dir)][src[1] - 2] === null) {	//check that square between the jump is an enemy piece, and dst is null
+				console.log("left jump is valid");
 				validJumps.push([src[0] + (2*dir), src[1] - 2]);
 				squares[src[0] + dir][src[1] - 1] = null;
-				validJumps.push(...this.validJumps([src[0] + (2*dir), src[1] - 2], squares));
+				validJumps.push(...this.showValidJumps([src[0] + (2*dir), src[1] - 2], squares));
 				}
 		}
 		return validJumps;		
