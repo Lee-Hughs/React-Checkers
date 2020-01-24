@@ -17,8 +17,6 @@ class Game extends React.Component {
 		squares.push(["r",null,"r",null,"r",null,"r",null]);
 		squares.push([null,"r",null,"r",null,"r",null,"r"]);
 
-		console.log("Game");
-		console.log(squares);
 		this.state= {
 			squares: squares,
 			stepNumber: 0,
@@ -28,32 +26,18 @@ class Game extends React.Component {
 	}
 
 	handleClick(src) {
-		console.log(src);
-		console.log(this.state.moveFrom);
-		console.log("State");
-		console.log(this.state);
 		const moveFrom = this.state.moveFrom.slice();
 		const squares = this.state.squares.slice();
 		if(JSON.stringify(moveFrom) === JSON.stringify([-1,-1])) {
-			console.log("move from = -1");
-			console.log(this.state.player);
-			console.log(squares[src[0]][src[1]]);
 			if(!this.state.player.includes(squares[src[0]][src[1]]))
 				return; //todo: add error message
 			console.log("selected correct player");
 			this.setState((state) => {
 				return {moveFrom: src.slice()}
 			});
-			console.log("State after changing move from, about to call showValidMoves");
-			console.log(this.state);
 			this.showValidMoves(src);
 		}
 		else {
-			console.log("State before changing moveFrom back");
-			console.log(this.state);
-			console.log("About to compare moveFrom and src");
-			console.log(this.state.moveFrom);
-			console.log(src);
 			if(JSON.stringify(moveFrom) === JSON.stringify(src)) {
 				this.setState((state) => {
 					return {moveFrom: [-1,-1]}
@@ -61,7 +45,13 @@ class Game extends React.Component {
 				this.clearHighlights();
 				return;
 			}
-			//todo:do second half of move
+			if(squares[src[0]][src[1]] !== 'h') {
+				//todo: add error message, invalid move
+				return;
+			}
+			else {
+				this.executeMove(moveFrom, src);
+			}
 		}
 		return;
 	}
@@ -70,6 +60,8 @@ class Game extends React.Component {
 		for(let index = 0; index < 8; index++) {
 			squares.push(this.state.squares[index].slice());
 		}
+		console.log("clearing highlights");
+		console.log(squares);
 		for(var row of squares) {
 			for(var index = 0; index < 8; index++) {
 				if(row[index] === 'h') {
@@ -90,7 +82,6 @@ class Game extends React.Component {
 			squares.push(this.state.squares[index].slice());
 		}
 		const dir = this.state.player === 'Rr' ? -1:1;
-		console.log("dir: " + dir);
 		if(src[0] + dir >= 0 && src[0] + dir < 8 && src[1] + 1 >= 0 && src[1] + 1 < 8) 
 			if(!squares[src[0] + dir][src[1] + 1] ) {
 				validMoves.push([src[0] + dir, src[1] + 1]);
@@ -106,7 +97,6 @@ class Game extends React.Component {
 		this.setState((state) => {
 			return {squares: squares}
 		});
-		console.log(squares);
 	}
 	showValidJumps(src, squaresRef) {
 		let squares = [];
@@ -114,34 +104,44 @@ class Game extends React.Component {
 			squares.push(squaresRef[index].slice());
 		}
 		let validJumps = [];
-		console.log("Starting looking for jumps");
 		const dir = this.state.player === 'Rr' ? -1:1;
 		const enemy = this.state.player === 'Rr' ? 'Bb':'Rr';
-		console.log("dir: " + dir);
-		console.log("enemy: " + enemy);
 		if(src[0] + (2*dir) >= 0 && src[0] + (2*dir) < 8 && src[1] + 2 >= 0 && src[1] + 2 < 8) {	//check that the right jump is within the board
-			console.log("right jump is on board");
 			if(enemy.includes(squares[src[0] + dir][src[1] + 1])  && squares[src[0] + (2*dir)][src[1] + 2] === null) {	//check that square between the jump is an enemy piece, and dst in null
-				console.log("right jump is valid");
 				validJumps.push([src[0] + (2*dir), src[1] + 2]);
 				squares[src[0] + dir][src[1] + 1] = null;
 				validJumps.push(...this.showValidJumps([src[0] + (2*dir), src[1] + 2], squares));
 				}
 		}
 		if(src[0] + (2*dir) >= 0 && src[0] + (2*dir) < 8 && src[1] - 2 >= 0 && src[1] - 2 < 8) {	//check that left jump is within the board
-			console.log("left jump is on board, valid enemy: ");
-			console.log("enemy: " + enemy);
-			console.log("square to jump: " + squares[src[0] + dir][src[1] - 1]);
-			console.log(enemy.includes(squares[src[0] + dir][src[1] - 1]));
-			console.log("destination: " + squares[src[0] + (2*dir)][src[1] - 2]);
 			if(enemy.includes(squares[src[0] + dir][src[1] - 1]) && squares[src[0] + (2*dir)][src[1] - 2] === null) {	//check that square between the jump is an enemy piece, and dst is null
-				console.log("left jump is valid");
 				validJumps.push([src[0] + (2*dir), src[1] - 2]);
 				squares[src[0] + dir][src[1] - 1] = null;
 				validJumps.push(...this.showValidJumps([src[0] + (2*dir), src[1] - 2], squares));
 				}
 		}
 		return validJumps;		
+	}
+	executeMove(src, dst) {
+		let squares = [];
+		for(let index = 0; index < 8; index++) {
+			squares.push(this.state.squares[index].slice());
+		}
+		const enemy = this.state.player === 'Rr' ? 'Bb':'Rr';
+		const step = this.state.stepNumber + 1;
+		squares[dst[0]][dst[1]] = squares[src[0]][src[1]];
+		squares[src[0]][src[1]] = null;
+		console.log("about to move piece");
+		console.log(squares);
+		this.setState((state) => {
+			return {squares: squares,
+				player: enemy,
+				stepNumber: step,
+				moveFrom: [-1, -1]
+				}
+		},this.clearHighlights);
+		console.log(src);
+		console.log(dst);
 	}
 	render() {
 	const squares = this.state.squares.slice();
@@ -152,6 +152,10 @@ class Game extends React.Component {
 					squares={squares}
 					onClick={(src) => this.handleClick(src)}
 				/>
+				<div className="stats">
+					<p>Player: {this.state.player}</p>
+					<p>MoveNumber: {this.state.stepNumber}</p>
+				</div>
 			</div>
 		);
 	}
@@ -204,10 +208,6 @@ class Board extends React.Component {
 				}
 
 	render() {
-		console.log("Board");
-		console.log(this.props.squares);
-		//let arrSquares = Array.from(this.state.squares.squares);
-		//console.log(arrSquares);
 		return (
 			<div className="board">
 				{this.renderRow(0)}

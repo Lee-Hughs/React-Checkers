@@ -36,3 +36,8 @@ p {
 	height:50px;
 	box-shadow:#dfff00 0px 0px 10px 4px inset;
 }
+
+.stats p {
+	color:black;
+	text-align:left;
+}
