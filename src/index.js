@@ -11,7 +11,7 @@ class Game extends React.Component {
 		squares.push(["b",null,"b",null,"b",null,"b",null]);
 
 		squares.push([null, null, null, null, null, null, null, null]);
-		squares.push([null, null, "b", null, null, null, null, null]);
+		squares.push([null, null, "B", null, null, null, null, null]);
 		
 		squares.push([null,"r",null,"r",null,"r",null,"r"]);
 		squares.push(["r",null,"r",null,"r",null,"r",null]);
@@ -82,14 +82,29 @@ class Game extends React.Component {
 			squares.push(this.state.squares[index].slice());
 		}
 		const dir = this.state.player === 'Rr' ? -1:1;
+		//Forward - Right check
 		if(src[0] + dir >= 0 && src[0] + dir < 8 && src[1] + 1 >= 0 && src[1] + 1 < 8) 
 			if(!squares[src[0] + dir][src[1] + 1] ) {
 				validMoves.push([src[0] + dir, src[1] + 1]);
 			}
+		//Forward - Left check
 		if(src[0] + dir >= 0 && src[0] + dir < 8 && src[1] - 1 >= 0 && src[1] - 1 < 8) 
 			if(!squares[src[0] + dir][src[1] - 1] ) {
 				validMoves.push([src[0] + dir, src[1] - 1]);
 			}
+		//Backwards Checks
+		if("RB".includes(squares[src[0]][src[1]])) {
+			//Backward - Right check
+			if(src[0] - dir >= 0 && src[0] - dir < 8 && src[1] + 1 >= 0 && src[1] + 1 < 8) 
+				if(!squares[src[0] - dir][src[1] + 1] ) {
+					validMoves.push([src[0] - dir, src[1] + 1]);
+				}
+			//Backward - Left check
+			if(src[0] - dir >= 0 && src[0] - dir < 8 && src[1] - 1 >= 0 && src[1] - 1 < 8) 
+				if(!squares[src[0] - dir][src[1] - 1] ) {
+					validMoves.push([src[0] - dir, src[1] - 1]);
+				}
+		}
 		validMoves.push(...this.showValidJumps(src, squares));
 		for(var move of validMoves) {
 			squares[move[0]][move[1]] = 'h';
