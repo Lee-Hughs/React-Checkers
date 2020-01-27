@@ -158,6 +158,10 @@ class Game extends React.Component {
 			squares[dst[0]][dst[1]] = squares[src[0]][src[1]];
 			squares[src[0]][src[1]] = null;
 		}
+		const kingRow = this.state.player === 'Rr' ? 0 : 7;
+		if(dst[0] === kingRow) {
+			squares[dst[0]][dst[1]] = squares[dst[0]][dst[1]].toUpperCase();
+		}
 		console.log("about to move piece");
 		console.log(squares);
 		this.setState((state) => {
