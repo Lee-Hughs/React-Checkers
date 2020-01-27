@@ -8,7 +8,7 @@ class Game extends React.Component {
 		let squares = [];
 		squares.push(["b",null,"b",null,"b",null,"b",null]);
 		squares.push([null,"b",null,"b",null,null,null,"b"]);
-		squares.push(["b",null,"b",null,"b",null,"b",null]);
+		squares.push(["b",null,"b",null,"r",null,"b",null]);
 
 		squares.push([null, null, null, null, null, null, null, null]);
 		squares.push([null, null, "B", null, null, null, null, null]);
@@ -95,10 +95,11 @@ class Game extends React.Component {
 		//Backwards Checks
 		if("RB".includes(squares[src[0]][src[1]])) {
 			//Backward - Right check
-			if(src[0] - dir >= 0 && src[0] - dir < 8 && src[1] + 1 >= 0 && src[1] + 1 < 8) 
+			if(src[0] - dir >= 0 && src[0] - dir < 8 && src[1] + 1 >= 0 && src[1] + 1 < 8) {
 				if(!squares[src[0] - dir][src[1] + 1] ) {
 					validMoves.push([src[0] - dir, src[1] + 1]);
 				}
+			}
 			//Backward - Left check
 			if(src[0] - dir >= 0 && src[0] - dir < 8 && src[1] - 1 >= 0 && src[1] - 1 < 8) 
 				if(!squares[src[0] - dir][src[1] - 1] ) {
@@ -119,7 +120,7 @@ class Game extends React.Component {
 			squares.push(squaresRef[index].slice());
 		}
 		let validJumps = [];
-		const dir = this.state.player === 'Rr' ? -1:1;
+		let dir = this.state.player === 'Rr' ? -1:1;
 		const enemy = this.state.player === 'Rr' ? 'Bb':'Rr';
 		if(src[0] + (2*dir) >= 0 && src[0] + (2*dir) < 8 && src[1] + 2 >= 0 && src[1] + 2 < 8) {	//check that the right jump is within the board
 			if(enemy.includes(squares[src[0] + dir][src[1] + 1])  && squares[src[0] + (2*dir)][src[1] + 2] === null) {	//check that square between the jump is an enemy piece, and dst in null
@@ -135,6 +136,26 @@ class Game extends React.Component {
 				validJumps.push(...this.showValidJumps([src[0] + (2*dir), src[1] - 2], squares));
 				}
 		}
+		//backwards checks
+		if("RB".includes(squares[src[0]][src[1]])) {
+			console.log("checking king jumps");
+			dir = dir * -1;
+			if(src[0] + (2*dir) >= 0 && src[0] + (2*dir) < 8 && src[1] + 2 >= 0 && src[1] + 2 < 8) {	//check that the right jump is within the board
+				if(enemy.includes(squares[src[0] + dir][src[1] + 1])  && squares[src[0] + (2*dir)][src[1] + 2] === null) {
+					validJumps.push([src[0] + (2*dir), src[1] + 2]);
+					squares[src[0] + dir][src[1] + 1] = null;
+					validJumps.push(...this.showValidJumps([src[0] + (2*dir), src[1] + 2], squares));
+					}
+			}
+			if(src[0] + (2*dir) >= 0 && src[0] + (2*dir) < 8 && src[1] - 2 >= 0 && src[1] - 2 < 8) {	//check that left jump is within the board
+				if(enemy.includes(squares[src[0] + dir][src[1] - 1]) && squares[src[0] + (2*dir)][src[1] - 2] === null) {	
+					validJumps.push([src[0] + (2*dir), src[1] - 2]);
+					squares[src[0] + dir][src[1] - 1] = null;
+					validJumps.push(...this.showValidJumps([src[0] + (2*dir), src[1] - 2], squares));
+					}
+			}
+		}
+
 		return validJumps;		
 	}
 	executeMove(src, dst) {
