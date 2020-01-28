@@ -11,11 +11,11 @@ class Game extends React.Component {
 		squares.push(["b",null,"b",null,"r",null,"b",null]);
 
 		squares.push([null, null, null, null, null, null, null, null]);
-		squares.push([null, null, "B", null, null, null, null, null]);
+		squares.push([null, null, "r", null, null, null, null, null]);
 		
-		squares.push([null,"r",null,"r",null,"r",null,"r"]);
+		squares.push([null,null,null,"r",null,"r",null,"r"]);
 		squares.push(["r",null,"r",null,"r",null,"r",null]);
-		squares.push([null,"r",null,"r",null,"r",null,"r"]);
+		squares.push([null,null,null,"B",null,"r",null,"r"]);
 
 		this.state= {
 			squares: squares,
@@ -37,8 +37,7 @@ class Game extends React.Component {
 			console.log("selected correct player");
 			this.setState((state) => {
 				return {moveFrom: src.slice()}
-			});
-			this.showValidMoves(src);
+			},function(){ return this.showValidMoves(src); });
 		}
 		else {
 			if(JSON.stringify(moveFrom) === JSON.stringify(src)) {
@@ -76,6 +75,7 @@ class Game extends React.Component {
 		});
 	}
 	showValidMoves(src) {
+		console.log(src);
 		let validMoves = [];
 		let squares = [];
 		for(let index = 0; index < 8; index++) {
@@ -115,6 +115,9 @@ class Game extends React.Component {
 		});
 	}
 	showValidJumps(src, squaresRef) {
+		console.log("show valid moves, src: ");
+		console.log(src);
+		console.log(squaresRef);
 		let squares = [];
 		for(let index = 0; index < 8; index++) {
 			squares.push(squaresRef[index].slice());
@@ -124,6 +127,7 @@ class Game extends React.Component {
 		const enemy = this.state.player === 'Rr' ? 'Bb':'Rr';
 		if(src[0] + (2*dir) >= 0 && src[0] + (2*dir) < 8 && src[1] + 2 >= 0 && src[1] + 2 < 8) {	//check that the right jump is within the board
 			if(enemy.includes(squares[src[0] + dir][src[1] + 1])  && squares[src[0] + (2*dir)][src[1] + 2] === null) {	//check that square between the jump is an enemy piece, and dst in null
+				console.log("right is valid");
 				validJumps.push([src[0] + (2*dir), src[1] + 2]);
 				squares[src[0] + dir][src[1] + 1] = null;
 				validJumps.push(...this.showValidJumps([src[0] + (2*dir), src[1] + 2], squares));
@@ -131,24 +135,28 @@ class Game extends React.Component {
 		}
 		if(src[0] + (2*dir) >= 0 && src[0] + (2*dir) < 8 && src[1] - 2 >= 0 && src[1] - 2 < 8) {	//check that left jump is within the board
 			if(enemy.includes(squares[src[0] + dir][src[1] - 1]) && squares[src[0] + (2*dir)][src[1] - 2] === null) {	//check that square between the jump is an enemy piece, and dst is null
+				console.log("left is valid");
 				validJumps.push([src[0] + (2*dir), src[1] - 2]);
 				squares[src[0] + dir][src[1] - 1] = null;
 				validJumps.push(...this.showValidJumps([src[0] + (2*dir), src[1] - 2], squares));
 				}
 		}
 		//backwards checks
-		if("RB".includes(squares[src[0]][src[1]])) {
+		if("RB".includes(squares[this.state.moveFrom[0]][this.state.moveFrom[1]])) {
 			console.log("checking king jumps");
 			dir = dir * -1;
 			if(src[0] + (2*dir) >= 0 && src[0] + (2*dir) < 8 && src[1] + 2 >= 0 && src[1] + 2 < 8) {	//check that the right jump is within the board
 				if(enemy.includes(squares[src[0] + dir][src[1] + 1])  && squares[src[0] + (2*dir)][src[1] + 2] === null) {
+					console.log("backwards right is valid");
 					validJumps.push([src[0] + (2*dir), src[1] + 2]);
 					squares[src[0] + dir][src[1] + 1] = null;
 					validJumps.push(...this.showValidJumps([src[0] + (2*dir), src[1] + 2], squares));
 					}
 			}
 			if(src[0] + (2*dir) >= 0 && src[0] + (2*dir) < 8 && src[1] - 2 >= 0 && src[1] - 2 < 8) {	//check that left jump is within the board
+				console.log("looking backwards left");
 				if(enemy.includes(squares[src[0] + dir][src[1] - 1]) && squares[src[0] + (2*dir)][src[1] - 2] === null) {	
+					console.log("backwards left is valid");
 					validJumps.push([src[0] + (2*dir), src[1] - 2]);
 					squares[src[0] + dir][src[1] - 1] = null;
 					validJumps.push(...this.showValidJumps([src[0] + (2*dir), src[1] - 2], squares));
