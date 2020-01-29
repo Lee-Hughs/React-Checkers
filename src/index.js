@@ -180,6 +180,8 @@ class Game extends React.Component {
 		}
 		else {
 			let route = this.getRoute(src, dst, squares);
+			console.log("route:");
+			console.log(route);
 			//iterate through path and remove the pieces in route
 			for(let i = 0; i < route.length-1; i++) {
 				squares[(route[i][0]+route[i+1][0])/2][(route[i][1]+route[i+1][1])/2] = null;
@@ -202,75 +204,66 @@ class Game extends React.Component {
 		},this.clearHighlights);
 	}
 	getRoute(src, dst, squaresRef) {
+		console.log("dst:");
+		console.log(dst);
+		let moveTree = new MoveTree(src);
+		this.getRouteHelper(src, 0, squaresRef, moveTree);
+		console.log(moveTree.moves);
+		let route = [];
+		for(let i = moveTree.moves.length-1; i > 0;) {
+			console.log("i: " + i);
+			console.log(moveTree.moves[i]);
+			if(route.length > 0 || JSON.stringify(moveTree.moves[i]) === JSON.stringify(dst) ) {
+				route.push(moveTree.moves[i]);
+				i = Math.floor((i-1)/4);
+			}
+			else {
+				i--;
+			}
+		}
+		route.push(src);
+		route = route.reverse();
+		return route;
+	}
+	getRouteHelper(src, srcIndex, squaresRef, tree) {
 		let squares = [];
 		const enemy = this.state.player === 'Rr' ? 'Bb':'Rr';
 		for(let index = 0; index < 8; index++) {
 			squares.push(squaresRef[index].slice());
 		}
-		let route = [];
-		
-		//check forward - left
+		//look left forward
 		if(src[0] + 2 >= 0 && src[0] + 2 < 8 && src[1] - 2 >= 0 && src[1] - 2 < 8) {	//check that the right jump is within the board
 			if(enemy.includes(squares[src[0] + 1][src[1] - 1])  && squares[src[0] + 2][src[1] - 2] === 'h') {	//check that square between the jump is an enemy piece, and dst in null
-				route = [];
-				route.push(src);
-				route.push([src[0] + 2, src[1] - 2]);
-				squares[src[0]+2][src[1]-2] = squares[src[0]][src[1]];
-				squares[src[0]][src[1]] = null;
+				tree.moves[srcIndex * 4 + 1] = [src[0] + 2, src[1] - 2];
 				squares[src[0]+1][src[1]-1] = null;
-				if(src[0] + 2 === dst[0] && src[1] - 2 === dst[1])
-					return route;
-				else
-					route.push(...this.getRoute([src[0] + 2,src[1] - 2], dst, squares));
+				this.getRouteHelper([src[0]+2,src[1]-2], srcIndex*4+1,squares,tree);
 			}
 		}
-		
-		//check forward right
-		if(src[0] + 2 >= 0 && src[0] + 2 < 8 && src[1] + 2 >= 0 && src[1] + 2 < 8) {
-			if(enemy.includes(squares[src[0] + 1][src[1] + 1])  && squares[src[0] + 2][src[1] + 2] === 'h') {
-				route = [];
-				route.push(src);
-				route.push([src[0] + 2, src[1] + 2]);
-				squares[src[0]+2][src[1]+2] = squares[src[0]][src[1]];
-				squares[src[0]][src[1]] = null;
+		//look right forward
+		if(src[0] + 2 >= 0 && src[0] + 2 < 8 && src[1] + 2 >= 0 && src[1] + 2 < 8) {	//check that the right jump is within the board
+			if(enemy.includes(squares[src[0] + 1][src[1] + 1])  && squares[src[0] + 2][src[1] + 2] === 'h') {	//check that square between the jump is an enemy piece, and dst in null
+				tree.moves[srcIndex * 4 + 2] = [src[0] + 2, src[1] + 2];
 				squares[src[0]+1][src[1]+1] = null;
-				if(src[0] + 2 === dst[0] && src[1] + 2 === dst[1])
-					return route;
-				else
-					route.push(...this.getRoute([src[0] + 2,src[1] + 2], dst, squares));
+				this.getRouteHelper([src[0]+2,src[1]+2], srcIndex*4+2,squares,tree);
 			}
 		}
-		//check back left
+		//look left back
 		if(src[0] - 2 >= 0 && src[0] - 2 < 8 && src[1] - 2 >= 0 && src[1] - 2 < 8) {	//check that the right jump is within the board
 			if(enemy.includes(squares[src[0] - 1][src[1] - 1])  && squares[src[0] - 2][src[1] - 2] === 'h') {	//check that square between the jump is an enemy piece, and dst in null
-				route = [];
-				route.push(src);
-				route.push([src[0] - 2, src[1] - 2]);
-				squares[src[0]-2][src[1]-2] = squares[src[0]][src[1]];
-				squares[src[0]][src[1]] = null;
+				tree.moves[srcIndex * 4 + 3] = [src[0] - 2, src[1] - 2];
 				squares[src[0]-1][src[1]-1] = null;
-				if(src[0] - 2 === dst[0] && src[1] - 2 === dst[1])
-					return route;
-				else
-					route.push(...this.getRoute([src[0] - 2,src[1] - 2], dst, squares));
+				this.getRouteHelper([src[0]-2,src[1]-2], srcIndex*4+3,squares,tree);
 			}
 		}
-		//check back right
+		//look right back
 		if(src[0] - 2 >= 0 && src[0] - 2 < 8 && src[1] + 2 >= 0 && src[1] + 2 < 8) {	//check that the right jump is within the board
 			if(enemy.includes(squares[src[0] - 1][src[1] + 1])  && squares[src[0] - 2][src[1] + 2] === 'h') {	//check that square between the jump is an enemy piece, and dst in null
-				route = [];
-				route.push(src);
-				route.push([src[0] - 2, src[1] + 2]);
-				squares[src[0]-2][src[1]+2] = squares[src[0]][src[1]];
-				squares[src[0]][src[1]] = null;
+				tree.moves[srcIndex * 4 + 4] = [src[0] - 2, src[1] + 2];
 				squares[src[0]-1][src[1]+1] = null;
-				if(src[0] - 2 === dst[0] && src[1] + 2 === dst[1])
-					return route;
-				else
-					route.push(...this.getRoute([src[0] - 2,src[1] + 2], dst, squares));
+				this.getRouteHelper([src[0]-2,src[1]+2], srcIndex*4+4,squares,tree);
 			}
 		}
-		return route;
+
 	}
 	render() {
 	const squares = this.state.squares.slice();
@@ -378,3 +371,10 @@ ReactDOM.render(
 /*function calculateWinner(squares) {
 
 }*/
+
+function MoveTree(src) {
+	this.moves = [];
+	this.moves.push(src);
+}
+
+
