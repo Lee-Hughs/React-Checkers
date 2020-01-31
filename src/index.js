@@ -7,25 +7,50 @@ class Game extends React.Component {
 		super(props);
 		let squares = [];
 		squares.push(["b",null,"b",null,"b",null,"b",null]);
-		squares.push([null,"b",null,"b",null,null,null,"b"]);
-		squares.push(["b",null,"b",null,"r",null,"b",null]);
+		squares.push([null,"b",null,"b",null,"b",null,"b"]);
+		squares.push(["b",null,"b",null,"b",null,"b",null]);
 
 		squares.push([null, null, null, null, null, null, null, null]);
-		squares.push([null, null, "r", null, null, null, null, null]);
+		squares.push([null, null, null, null, null, null, null, null]);
 		
-		squares.push([null,null,null,"r",null,"r",null,"r"]);
+		squares.push([null,"r",null,"r",null,"r",null,"r"]);
 		squares.push(["r",null,"r",null,"r",null,"r",null]);
-		squares.push([null,null,null,"B",null,"r",null,"r"]);
+		squares.push([null,"r",null,"r",null,"r",null,"r"]);
 
 		this.state= {
 			squares: squares,
 			stepNumber: 0,
 			player: 'Rr',
-			moveFrom: [-1,-1]
+			moveFrom: [-1,-1],
+			winner: null
+		};
+	}
+	getInitialState() {
+		let squares = [];
+		squares.push(["b",null,"b",null,"b",null,"b",null]);
+		squares.push([null,"b",null,"b",null,"b",null,"b"]);
+		squares.push(["b",null,"b",null,"b",null,"b",null]);
+
+		squares.push([null, null, null, null, null, null, null, null]);
+		squares.push([null, null, null, null, null, null, null, null]);
+		
+		squares.push([null,"r",null,"r",null,"r",null,"r"]);
+		squares.push(["r",null,"r",null,"r",null,"r",null]);
+		squares.push([null,"r",null,"r",null,"r",null,"r"]);
+
+		return {
+			squares: squares,
+			stepNumber: 0,
+			player: 'Rr',
+			moveFrom: [-1,-1],
+			winner: null
 		};
 	}
 
 	handleClick(src) {
+		if(this.state.winner) {
+			return
+		}
 		const moveFrom = this.state.moveFrom.slice();
 		let squares = [];
 		for(let index = 0; index < 8; index++) {
@@ -173,6 +198,7 @@ class Game extends React.Component {
 			squares.push(this.state.squares[index].slice());
 		}
 		const enemy = this.state.player === 'Rr' ? 'Bb':'Rr';
+		const player = this.state.player;
 		const step = this.state.stepNumber + 1;
 		if(Math.abs(src[0] - dst[0]) === 1 && Math.abs(src[1] - dst[1]) === 1) {
 			squares[dst[0]][dst[1]] = squares[src[0]][src[1]];
@@ -195,6 +221,7 @@ class Game extends React.Component {
 		}
 		console.log("about to move piece");
 		console.log(squares);
+		this.calculateWinner(squares, player);
 		this.setState((state) => {
 			return {squares: squares,
 				player: enemy,
@@ -263,6 +290,78 @@ class Game extends React.Component {
 				this.getRouteHelper([src[0]-2,src[1]+2], srcIndex*4+4,squares,tree);
 			}
 		}
+	}
+	calculateWinner(squaresRef, player) {
+		let squares = [];
+		for(let index = 0; index < 8; index++) {
+			squares.push(squaresRef[index].slice());
+		}
+		for(var row of squares) {
+			for(var index = 0; index < 8; index++) {
+				if(row[index] === 'h') {
+					row[index] = null;
+				}
+			}
+		}
+		console.log("calculate winner");
+		const enemy = player === "Rr" ? "Bb" : "Rr";
+		const dir = this.state.player === 'Rr' ? 1:-1;
+		console.log("dir: " + dir);
+		console.log("player: " + player);
+		let enemySquares = [];
+		for(let i = 0; i < 8; i++) {
+			for(let j = 0; j < 8; j++) {
+				if(enemy.includes(squares[i][j])) {
+					enemySquares.push([i,j]);
+				}
+			}
+		}
+		//if the enemy has no pieces left
+		if(enemySquares.length === 0) {
+			this.setState((state) => {
+				return {winner: player}
+			});
+			return;
+		}
+		for(let i = 0; i < enemySquares.length; i++) {
+			//Forward - Right check
+			if(enemySquares[i][0] + dir >= 0 && enemySquares[i][0] + dir < 8 && enemySquares[i][1] + 1 >= 0 && enemySquares[i][1] + 1 < 8) {
+				if(!squares[enemySquares[i][0] + dir][enemySquares[i][1] + 1] ) {
+					return;
+				}
+			}
+			//Forward - Left check
+			if(enemySquares[i][0] + dir >= 0 && enemySquares[i][0] + dir < 8 && enemySquares[i][1] - 1 >= 0 && enemySquares[i][1] - 1 < 8) {
+				if(!squares[enemySquares[i][0] + dir][enemySquares[i][1] - 1] ) {
+					return;
+				}
+			}
+			//Backwards Checks
+			if("RB".includes(squares[enemySquares[i][0]][enemySquares[i][1]])) {
+				//Backward - Right check
+				if(enemySquares[i][0] - dir >= 0 && enemySquares[i][0] - dir < 8 && enemySquares[i][1] + 1 >= 0 && enemySquares[i][1] + 1 < 8) {
+					if(!squares[enemySquares[i][0] - dir][enemySquares[i][1] + 1] ) {
+						return;
+					}
+				}
+				//Backward - Left check
+				if(enemySquares[i][0] - dir >= 0 && enemySquares[i][0] - dir < 8 && enemySquares[i][1] - 1 >= 0 && enemySquares[i][1] - 1 < 8) {
+					if(!squares[enemySquares[i][0] - dir][enemySquares[i][1] - 1] ) {
+						return;
+					}
+				}
+			}
+		}
+		for(let i = 0; i < enemySquares.length; i++) {
+			let temp = new MoveTree(enemySquares[i]);
+			this.getRouteHelper(enemySquares[i], 0, squares, temp);
+			if(temp.moves.length > 1) {
+				return;
+			}
+		}
+		this.setState((state) => {
+			return {winner: player}
+		});
 
 	}
 	render() {
@@ -278,6 +377,10 @@ class Game extends React.Component {
 					<p>Player: {this.state.player}</p>
 					<p>MoveNumber: {this.state.stepNumber}</p>
 				</div>
+				<PlayAgainButton 
+					winner={this.state.winner}
+				/>
+
 			</div>
 		);
 	}
@@ -346,18 +449,66 @@ class Board extends React.Component {
 }
 
 function Square(props) {
-	if(props.value === 'h') {
-		return (
-			<div className="selectedSquare" onClick={props.onClick}>
-				<p></p>
-			</div>
-		);
+	switch(props.value) {
+		case 'h':
+			return (
+				<div className="square">
+					<div className="selectedSquare" onClick={props.onClick}>
+					</div>
+				</div>
+			);
+		case 'r':
+			return (
+				<div className="square">
+				<div className="redSquare" onClick={props.onClick}>
+				</div>
+				</div>
+			);
+		case 'b':
+			return (
+				<div className="square">
+				<div className="blackSquare" onClick={props.onClick}>
+				</div>
+				</div>
+			);
+		case 'R':
+			return (
+				<div className="square">
+				<div className="redSquare" onClick={props.onClick}>
+					<p>K</p>
+				</div>
+				</div>
+			);
+		case 'B':
+			return (
+				<div className="square">
+				<div className="blackSquare" onClick={props.onClick}>
+					<p>K</p>
+				</div>
+				</div>
+			);
+		default:
+			return (
+				<div className="square" onClick={props.onClick}>
+				</div>
+			);
+			
 	}
+
 	return (
 		<div className="square" onClick={props.onClick}>
 			<p>{props.value}</p>
 		</div>
 	);
+}
+
+function PlayAgainButton(props) {
+	if(props.winner) {
+		return (
+			<button type="button">Play Again?</button>
+		);
+	}
+	return null;
 }
 
 
@@ -368,9 +519,6 @@ ReactDOM.render(
 	document.getElementById("root")
 );
 
-/*function calculateWinner(squares) {
-
-}*/
 
 function MoveTree(src) {
 	this.moves = [];
