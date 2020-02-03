@@ -475,7 +475,7 @@ function Square(props) {
 			return (
 				<div className="square">
 				<div className="redSquare" onClick={props.onClick}>
-					<p>K</p>
+					<img src={process.env.PUBLIC_URL + "/img/crown.png"} alt="king" />
 				</div>
 				</div>
 			);
@@ -483,7 +483,7 @@ function Square(props) {
 			return (
 				<div className="square">
 				<div className="blackSquare" onClick={props.onClick}>
-					<p>K</p>
+					<img src={process.env.PUBLIC_URL + "/img/crown.png"} alt="king" />
 				</div>
 				</div>
 			);

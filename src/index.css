@@ -22,6 +22,7 @@
 	background-color:#4d0000;
 	margin:auto;
 	margin-top:12.5%;
+	border:2x inset;
 }
 .blackSquare {
 	height:75%;
@@ -30,6 +31,7 @@
 	background-color:#262626;
 	margin:auto;
 	margin-top:12.5%;
+	border:2px inset;
 }
 .row:nth-child(even) .square:nth-child(even) {
 	background-color:rgba(255,0,0,0.5);
