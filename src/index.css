@@ -21,8 +21,8 @@
 	border-radius:50%;
 	background-color:#4d0000;
 	margin:auto;
-	margin-top:12.5%;
-	border:2x inset;
+	margin-top:6.5%;
+	border:2px inset;
 }
 .blackSquare {
 	height:75%;
@@ -30,7 +30,7 @@
 	border-radius:50%;
 	background-color:#262626;
 	margin:auto;
-	margin-top:12.5%;
+	margin-top:6.5%;
 	border:2px inset;
 }
 .row:nth-child(even) .square:nth-child(even) {

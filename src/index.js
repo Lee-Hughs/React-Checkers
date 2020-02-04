@@ -220,7 +220,7 @@ class Game extends React.Component {
 		}
 		api_load = api_load.substring(0,api_load.length-1);
 		api_load += "]";
-		fetch('/bot?board=' + api_load + '&player=Bb')
+		fetch('http://35.188.137.81/bot/?board=' + api_load + '&player=Bb')
 		.then(res => console.log(res))
 		.catch(console.log);
 	}
