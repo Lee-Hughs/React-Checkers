@@ -48,7 +48,18 @@ class Game extends React.Component {
 	}
 
 	handleClick(src) {
-		if(this.state.winner) {
+		console.log("testing:");
+		let api_load = "[";
+		for(let index = 0; index < 8; index++) {
+			api_load += JSON.stringify(this.state.squares[index]).substring(1,JSON.stringify(this.state.squares[index]).length-1);
+			api_load += ",";
+		}
+		api_load = api_load.substring(0,api_load.length-1);
+		api_load += "]";
+		console.log(api_load);
+
+		console.log(JSON.stringify(this.state.squares));
+		if(this.state.winner || this.state.player === "Bb") {
 			return
 		}
 		const moveFrom = this.state.moveFrom.slice();
@@ -66,10 +77,18 @@ class Game extends React.Component {
 		}
 		else {
 			if(JSON.stringify(moveFrom) === JSON.stringify(src)) {
+				for(var row of squares) {
+					for(var index = 0; index < 8; index++) {
+						if(row[index] === 'h') {
+							row[index] = null;
+						}
+					}
+				}
 				this.setState((state) => {
-					return {moveFrom: [-1,-1]}
+					return {squares: squares,
+						moveFrom: [-1,-1]}
 				});
-				this.clearHighlights();
+				//this.clearHighlights();
 				return;
 			}
 			if(squares[src[0]][src[1]] !== 'h') {
@@ -191,7 +210,21 @@ class Game extends React.Component {
 
 		return validJumps;		
 	}
-	executeMove(src, dst) {
+	test_function() {
+		console.log("this is a test function");
+		console.log(this.state.squares);
+		let api_load = "[";
+		for(let index = 0; index < 8; index++) {
+			api_load += JSON.stringify(this.state.squares[index]).substring(1,JSON.stringify(this.state.squares[index]).length-1);
+			api_load += ",";
+		}
+		api_load = api_load.substring(0,api_load.length-1);
+		api_load += "]";
+		fetch('/bot?board=' + api_load + '&player=Bb')
+		.then(res => console.log(res))
+		.catch(console.log);
+	}
+	executeMove(src, dst, callback = this.test_function.bind(this)) {
 		//this.clearHighlights();
 		let squares = [];
 		for(let index = 0; index < 8; index++) {
@@ -219,6 +252,13 @@ class Game extends React.Component {
 		if(dst[0] === kingRow) {
 			squares[dst[0]][dst[1]] = squares[dst[0]][dst[1]].toUpperCase();
 		}
+		for(var row of squares) {
+			for(var index = 0; index < 8; index++) {
+				if(row[index] === 'h') {
+					row[index] = null;
+				}
+			}
+		}
 		console.log("about to move piece");
 		console.log(squares);
 		this.calculateWinner(squares, player);
@@ -228,7 +268,45 @@ class Game extends React.Component {
 				stepNumber: step,
 				moveFrom: [-1, -1]
 				}
-		},this.clearHighlights);
+		},this.test_function );
+		console.log("this is before the callback");
+		//callback();
+	}
+	executeEnemyMove(move) {
+		let squares = [];
+		for(let index = 0; index < 8; index++) {
+			squares.push(this.state.squares[index].slice());
+		}
+		const enemy = 'Rr'
+		const player = 'Bb'
+		const step = this.state.stepNumber + 1;
+		if(Math.abs(move[0][0] - move[move.length-1][0]) === 1 && Math.abs(move[0][1] - move[move.length-1][1]) === 1) {
+			squares[move[move.length-1][0]][move[move.length-1][1]] = squares[move[0][0]][move[0][1]];
+			squares[move[0][0]][move[0][1]] = null;
+		}
+		else {
+			//iterate through path and remove the pieces in route
+			for(let i = 0; i < move.length-1; i++) {
+				squares[(move[i][0]+move[i+1][0])/2][(move[i][1]+move[i+1][1])/2] = null;
+			}
+			squares[move[move.length-1][0]][move[move.length-1][1]] = squares[move[0][0]][move[0][1]];
+			squares[move[0][0]][move[0][1]] = null;
+		}
+		const kingRow = this.state.player === 'Rr' ? 0 : 7;
+		if(move[move.length-1][0] === kingRow) {
+			squares[move[move.length-1][0]][move[move.length-1][1]] = squares[move[move.length-1][0]][move[move.length-1][1]].toUpperCase();
+		}
+		console.log("about to move piece");
+		console.log(squares);
+		this.calculateWinner(squares, player);
+		this.setState((state) => {
+			return {squares: squares,
+				player: 'Rr',
+				stepNumber: step,
+				moveFrom: [-1, -1]
+				}
+		});
+
 	}
 	getRoute(src, dst, squaresRef) {
 		console.log("dst:");
@@ -494,12 +572,6 @@ function Square(props) {
 			);
 			
 	}
-
-	return (
-		<div className="square" onClick={props.onClick}>
-			<p>{props.value}</p>
-		</div>
-	);
 }
 
 function PlayAgainButton(props) {
