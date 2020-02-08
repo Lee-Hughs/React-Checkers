@@ -220,9 +220,16 @@ class Game extends React.Component {
 		}
 		api_load = api_load.substring(0,api_load.length-1);
 		api_load += "]";
-		fetch('http://35.188.137.81/bot/?board=' + api_load + '&player=Bb')
-		.then(res => console.log(res))
-		.catch(console.log);
+		fetch('/checkers_bot/?board=' + api_load + '&player=Bb')
+		.then(res => res.json())
+		.then((data) => {
+			data = JSON.parse(data['express']);
+			this.executeEnemyMove(data);
+			console.log(data);
+		})
+        	.catch(console.log);
+		//.then(res => console.log(res))
+		//.catch(console.log);
 	}
 	executeMove(src, dst, callback = this.test_function.bind(this)) {
 		//this.clearHighlights();
