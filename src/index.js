@@ -48,7 +48,6 @@ class Game extends React.Component {
 	}
 
 	handleClick(src) {
-		console.log("testing:");
 		let api_load = "[";
 		for(let index = 0; index < 8; index++) {
 			api_load += JSON.stringify(this.state.squares[index]).substring(1,JSON.stringify(this.state.squares[index]).length-1);
@@ -56,9 +55,7 @@ class Game extends React.Component {
 		}
 		api_load = api_load.substring(0,api_load.length-1);
 		api_load += "]";
-		console.log(api_load);
 
-		console.log(JSON.stringify(this.state.squares));
 		if(this.state.winner || this.state.player === "Bb") {
 			return
 		}
@@ -70,7 +67,6 @@ class Game extends React.Component {
 		if(JSON.stringify(moveFrom) === JSON.stringify([-1,-1])) {
 			if(!this.state.player.includes(squares[src[0]][src[1]]))
 				return; //todo: add error message
-			console.log("selected correct player");
 			this.setState((state) => {
 				return {moveFrom: src.slice()}
 			},function(){ return this.showValidMoves(src); });
@@ -106,7 +102,6 @@ class Game extends React.Component {
 		for(let index = 0; index < 8; index++) {
 			squares.push(this.state.squares[index].slice());
 		}
-		console.log("clearing highlights");
 		for(var row of squares) {
 			for(var index = 0; index < 8; index++) {
 				if(row[index] === 'h') {
@@ -119,7 +114,6 @@ class Game extends React.Component {
 		});
 	}
 	showValidMoves(src) {
-		console.log(src);
 		let validMoves = [];
 		let squares = [];
 		for(let index = 0; index < 8; index++) {
@@ -159,9 +153,6 @@ class Game extends React.Component {
 		});
 	}
 	showValidJumps(src, squaresRef) {
-		console.log("show valid moves, src: ");
-		console.log(src);
-		console.log(squaresRef);
 		let squares = [];
 		for(let index = 0; index < 8; index++) {
 			squares.push(squaresRef[index].slice());
@@ -171,7 +162,6 @@ class Game extends React.Component {
 		const enemy = this.state.player === 'Rr' ? 'Bb':'Rr';
 		if(src[0] + (2*dir) >= 0 && src[0] + (2*dir) < 8 && src[1] + 2 >= 0 && src[1] + 2 < 8) {	//check that the right jump is within the board
 			if(enemy.includes(squares[src[0] + dir][src[1] + 1])  && squares[src[0] + (2*dir)][src[1] + 2] === null) {	//check that square between the jump is an enemy piece, and dst in null
-				console.log("right is valid");
 				validJumps.push([src[0] + (2*dir), src[1] + 2]);
 				squares[src[0] + dir][src[1] + 1] = null;
 				validJumps.push(...this.showValidJumps([src[0] + (2*dir), src[1] + 2], squares));
@@ -179,7 +169,6 @@ class Game extends React.Component {
 		}
 		if(src[0] + (2*dir) >= 0 && src[0] + (2*dir) < 8 && src[1] - 2 >= 0 && src[1] - 2 < 8) {	//check that left jump is within the board
 			if(enemy.includes(squares[src[0] + dir][src[1] - 1]) && squares[src[0] + (2*dir)][src[1] - 2] === null) {	//check that square between the jump is an enemy piece, and dst is null
-				console.log("left is valid");
 				validJumps.push([src[0] + (2*dir), src[1] - 2]);
 				squares[src[0] + dir][src[1] - 1] = null;
 				validJumps.push(...this.showValidJumps([src[0] + (2*dir), src[1] - 2], squares));
@@ -187,20 +176,16 @@ class Game extends React.Component {
 		}
 		//backwards checks
 		if("RB".includes(squares[this.state.moveFrom[0]][this.state.moveFrom[1]])) {
-			console.log("checking king jumps");
 			dir = dir * -1;
 			if(src[0] + (2*dir) >= 0 && src[0] + (2*dir) < 8 && src[1] + 2 >= 0 && src[1] + 2 < 8) {	//check that the right jump is within the board
 				if(enemy.includes(squares[src[0] + dir][src[1] + 1])  && squares[src[0] + (2*dir)][src[1] + 2] === null) {
-					console.log("backwards right is valid");
 					validJumps.push([src[0] + (2*dir), src[1] + 2]);
 					squares[src[0] + dir][src[1] + 1] = null;
 					validJumps.push(...this.showValidJumps([src[0] + (2*dir), src[1] + 2], squares));
 					}
 			}
 			if(src[0] + (2*dir) >= 0 && src[0] + (2*dir) < 8 && src[1] - 2 >= 0 && src[1] - 2 < 8) {	//check that left jump is within the board
-				console.log("looking backwards left");
 				if(enemy.includes(squares[src[0] + dir][src[1] - 1]) && squares[src[0] + (2*dir)][src[1] - 2] === null) {	
-					console.log("backwards left is valid");
 					validJumps.push([src[0] + (2*dir), src[1] - 2]);
 					squares[src[0] + dir][src[1] - 1] = null;
 					validJumps.push(...this.showValidJumps([src[0] + (2*dir), src[1] - 2], squares));
@@ -211,7 +196,6 @@ class Game extends React.Component {
 		return validJumps;		
 	}
 	test_function() {
-		console.log("this is a test function");
 		console.log(this.state.squares);
 		let api_load = "[";
 		for(let index = 0; index < 8; index++) {
@@ -246,8 +230,6 @@ class Game extends React.Component {
 		}
 		else {
 			let route = this.getRoute(src, dst, squares);
-			console.log("route:");
-			console.log(route);
 			//iterate through path and remove the pieces in route
 			for(let i = 0; i < route.length-1; i++) {
 				squares[(route[i][0]+route[i+1][0])/2][(route[i][1]+route[i+1][1])/2] = null;
@@ -266,8 +248,6 @@ class Game extends React.Component {
 				}
 			}
 		}
-		console.log("about to move piece");
-		console.log(squares);
 		this.calculateWinner(squares, player);
 		this.setState((state) => {
 			return {squares: squares,
@@ -276,7 +256,6 @@ class Game extends React.Component {
 				moveFrom: [-1, -1]
 				}
 		},this.test_function );
-		console.log("this is before the callback");
 		//callback();
 	}
 	executeEnemyMove(move) {
@@ -303,8 +282,6 @@ class Game extends React.Component {
 		if(move[move.length-1][0] === kingRow) {
 			squares[move[move.length-1][0]][move[move.length-1][1]] = squares[move[move.length-1][0]][move[move.length-1][1]].toUpperCase();
 		}
-		console.log("about to move piece");
-		console.log(squares);
 		this.calculateWinner(squares, player);
 		this.setState((state) => {
 			return {squares: squares,
@@ -316,15 +293,10 @@ class Game extends React.Component {
 
 	}
 	getRoute(src, dst, squaresRef) {
-		console.log("dst:");
-		console.log(dst);
 		let moveTree = new MoveTree(src);
 		this.getRouteHelper(src, 0, squaresRef, moveTree);
-		console.log(moveTree.moves);
 		let route = [];
 		for(let i = moveTree.moves.length-1; i > 0;) {
-			console.log("i: " + i);
-			console.log(moveTree.moves[i]);
 			if(route.length > 0 || JSON.stringify(moveTree.moves[i]) === JSON.stringify(dst) ) {
 				route.push(moveTree.moves[i]);
 				i = Math.floor((i-1)/4);
@@ -388,11 +360,8 @@ class Game extends React.Component {
 				}
 			}
 		}
-		console.log("calculate winner");
 		const enemy = player === "Rr" ? "Bb" : "Rr";
 		const dir = this.state.player === 'Rr' ? 1:-1;
-		console.log("dir: " + dir);
-		console.log("player: " + player);
 		let enemySquares = [];
 		for(let i = 0; i < 8; i++) {
 			for(let j = 0; j < 8; j++) {
@@ -560,7 +529,7 @@ function Square(props) {
 			return (
 				<div className="square">
 				<div className="redSquare" onClick={props.onClick}>
-					<img src={process.env.PUBLIC_URL + "/img/crown.png"} alt="king" />
+					<img src="logo192.png" alt="king" />
 				</div>
 				</div>
 			);
@@ -568,7 +537,7 @@ function Square(props) {
 			return (
 				<div className="square">
 				<div className="blackSquare" onClick={props.onClick}>
-					<img src={process.env.PUBLIC_URL + "/img/crown.png"} alt="king" />
+					<img src="logo192.png" alt="king" />
 				</div>
 				</div>
 			);

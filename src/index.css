@@ -59,3 +59,8 @@ p {
 	color:black;
 	text-align:left;
 }
+img {
+	width:90%;
+	height:90%;
+	padding:5%;
+}
