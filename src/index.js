@@ -421,20 +421,24 @@ class Game extends React.Component {
 	render() {
 	const squares = this.state.squares.slice();
 		return (
-			<div className="game">
-				<h2>Checkers</h2>
-				<Board 
-					squares={squares}
-					onClick={(src) => this.handleClick(src)}
-				/>
-				<div className="stats">
-					<p>Player: {this.state.player}</p>
-					<p>MoveNumber: {this.state.stepNumber}</p>
+			<div id="container">
+				<div id="bg">
 				</div>
-				<PlayAgainButton 
-					winner={this.state.winner}
-				/>
+					<div className="game">
+						<h2>Checkers</h2>
+						<Board 
+							squares={squares}
+							onClick={(src) => this.handleClick(src)}
+						/>
+						<div className="stats">
+							<p>Player: {this.state.player === 'Rr' ? 'Red' : 'Black'}</p>
+							<p>Move Number: {this.state.stepNumber}</p>
+						</div>
+						<PlayAgainButton 
+							winner={this.state.winner}
+						/>
 
+					</div>
 			</div>
 		);
 	}
