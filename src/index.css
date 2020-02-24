@@ -36,6 +36,10 @@ h2 {
 	width:max-content;
 	background-image: url("https://www.transparenttextures.com/patterns/45-degree-fabric-dark.png");
 	background-color:#5b5c76;
+	margin-bottom:10px;
+	border: 2px solid #c81ad6;
+	border-radius:2px;
+	box-shadow:0 0 4px white;
 }
 
 .row {
@@ -85,11 +89,16 @@ p {
 	height:50px;
 	box-shadow:#dfff00 0px 0px 10px 4px inset;
 }
-
+.stats {
+	background-color:#4c4e5380;
+	border-radius:5px;
+	padding:10px;
+}
 .stats p {
 	font-family:cyberSpaceRaceway;
 	color:white;
 	text-align:left;
+	font-size:12px;
 }
 img {
 	width:90%;
