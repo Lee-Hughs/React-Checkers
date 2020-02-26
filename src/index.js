@@ -425,7 +425,7 @@ class Game extends React.Component {
 				<div id="bg">
 				</div>
 					<div className="game">
-						<h2>Checkers</h2>
+						<h2>C<span>h</span>eck<span>e</span>rs</h2>
 						<Board 
 							squares={squares}
 							onClick={(src) => this.handleClick(src)}
