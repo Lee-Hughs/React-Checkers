@@ -34,9 +34,12 @@ h2 span:nth-of-type(2){
 	background-position:center;
 }
 .game {
-	position:relative;
+	position:absolute;
 	width:max-content;
-	margin:auto;
+	margin:0;
+	top:50%;
+	left:50%;
+	transform:translate(-50%,-50%);
 }
 
 .board {
@@ -44,9 +47,9 @@ h2 span:nth-of-type(2){
 	background-image: url("https://www.transparenttextures.com/patterns/45-degree-fabric-dark.png");
 	background-color:#5b5c76;
 	margin-bottom:10px;
-	border: 1px solid #white;
+	border: 1px solid white;
 	border-radius:3px;
-	box-shadow:0 0 15px #c81ad6;
+	box-shadow:0 0 15px #ee44ff;
 }
 
 .row {
@@ -94,7 +97,7 @@ p {
 .selectedSquare {
 	width:50px;
 	height:50px;
-	box-shadow:#dfff00 0px 0px 10px 4px inset;
+	box-shadow:#fee 0px 0px 10px 4px inset;
 }
 .stats {
 	background-color:#4c4e5380;
@@ -144,4 +147,60 @@ img {
 		color: inherit;
 		text-shadow: inherit;
 	}
+}
+
+@media screen and (min-width: 400px) {
+	/* mobile phones */
+	.square {
+		width:30px;
+		height:30px;
+	}
+	.selectedSquare {
+		width:30px;
+		height:30px;
+	}
+	h2 {
+		font-size:30px;
+	}
+	.stats p {
+		font-size:12px
+	}
+
+}
+
+@media screen and (min-width: 1024px) {
+	/*laptops*/
+	.square {
+		width:50px;
+		height:50px;
+	}
+	.selectedSquare {
+		width:50px;
+		height:50px;
+	}
+	h2 {
+		font-size:40px;
+	}
+	.stats p {
+		font-size:16px
+	}
+}
+@media screen and (min-width: 3840px) {
+	/*4k screens*/
+	.square {
+		width:130px;
+		height:130px;
+	}
+	.selectedSquare {
+		width:130px;
+		height:130px;
+	}
+	h2 {
+		font-size:120px;
+	}
+	.stats p {
+		font-size:48px
+	}
+	
+
 }
